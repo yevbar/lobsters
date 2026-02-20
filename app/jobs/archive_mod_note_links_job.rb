@@ -23,7 +23,10 @@ class ArchiveModNoteLinksJob < ApplicationJob
   private
 
   def extract_urls(text)
-    URI.extract(text, %w[http https]).uniq
+    URI.extract(text, %w[http https]).map { |url|
+      # URI.extract can grab trailing punctuation from markdown/prose, e.g. ) from [text](url)
+      url.sub(/[)\]>,;:!?.]+\z/, "")
+    }.uniq
   end
 
   def archive_url(url)
@@ -49,4 +52,5 @@ class ArchiveModNoteLinksJob < ApplicationJob
     end
   end
 end
+
 

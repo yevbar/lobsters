@@ -6,6 +6,7 @@ class Mod::NotesController < Mod::ModController
     @mod_note = ModNote.new(mod_note_params)
     @mod_note.moderator = @user
     if @mod_note.save
+      ArchiveModNoteLinksJob.perform_later(@mod_note)
       redirect_to user_path(@mod_note.user), success: "Noted"
     else
       # This is bad and needs to change if note ever has non-trivial validation
@@ -20,3 +21,4 @@ class Mod::NotesController < Mod::ModController
     params.require(:mod_note).permit(:username, :note)
   end
 end
+
